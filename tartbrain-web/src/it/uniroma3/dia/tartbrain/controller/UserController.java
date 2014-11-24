@@ -1,11 +1,15 @@
 package it.uniroma3.dia.tartbrain.controller;
 
 
+import it.uniroma3.dia.tartbrain.facade.RoleFacade;
 import it.uniroma3.dia.tartbrain.facade.UserFacade;
 import it.uniroma3.dia.tartbrain.model.Role;
 import it.uniroma3.dia.tartbrain.model.User;
+import it.uniroma3.dia.tartbrain.util.MyLog4J;
 
 import java.util.List;
+
+
 
 
 
@@ -26,49 +30,59 @@ import org.apache.log4j.PropertyConfigurator;
 @SessionScoped
 public class UserController {
 	
-	@ManagedProperty(value="")
 	private String email;
 	private String password;
 	private Long id;
 	private User user;
 	private Role role;
+	private String roleType;
 	
 	private List<User> users;
 	
 	@EJB
 	private UserFacade userFacade;
+	@EJB
+	private RoleFacade roleFacade;
+	@EJB
+	private MyLog4J myLog4J;
 
 	public String createUser() {
-		this.user = userFacade.createUser(email, password,role);
-		this.id = user.getId();
-		return "index"; 
+		myLog4J.getLog().debug("creazione");
+		this.user = userFacade.createUser(email, password,null);
+		//this.id = user.getId();
+		return "indexA"; 
 	}
 	
 	public String loginUser() {
-		 //load configuration File
-		//System.out.println(this.getClass().getClassLoader().getResource("").getPath());
-	      //PropertyConfigurator.configure(this.getClass().getClassLoader().getResource("").getPath()+"log.properties");
-	 
-	      //load configuration File in XML format
-	      //DomConfigurator.configure("myLog.xml");
-	 
-	      //get Logger Instance
-	      Logger log = Logger.getLogger(UserController.class);
-	 
+
 	      //writing some logs at different levels
-	      log.debug("Test Livello DEBUG");
-	      log.info("Test Livello INFO");
-	      log.warn("Test Livello WARNING");
-	      log.error("Test Livello ERROR");
-	      log.fatal("Test Livello FATAL");
+		myLog4J.getLog().debug("login");
+	      //log.debug("Test Livello DEBUG");
+	      //log.info("Test Livello INFO");
+	      //log.warn("Test Livello WARNING");
+	      //log.error("Test Livello ERROR");
+	      //log.fatal("Test Livello FATAL");
 		
 		this.user = userFacade.loginUser(email, password);
 		if(this.user == null)
 			return "error";
 		else
-			return "index";
+			if(this.user.getRole().getType().equals("Admin"))
+			return "indexA";
+			else
+				return "indexU";
 	}
 	
+	//lista utenti
+	public String usersList(){
+		this.users=userFacade.getAllUser();
+		return "userList";
+	}
+	
+	public String findUser(Long id){
+		this.user= userFacade.getUser(id);
+		return "user";
+	}
 
 	
 	public String getEmail() {

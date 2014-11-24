@@ -36,7 +36,8 @@
 								value="#{user.id}">
 								<f:setPropertyActionListener value="#{user.id}" target="#{userController.id}"/>
 							</h:commandLink></td>
-						
+							<td>${user.email}</td>
+						<td>${user.password}</td>
 					</tr>
 				</c:forEach>
 			</table>
