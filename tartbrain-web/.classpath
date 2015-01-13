@@ -25,5 +25,6 @@
 			<attribute name="owner.project.facets" value="jpt.jpa"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Nicola/Desktop/SolrSearch.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
