@@ -21,22 +21,22 @@ public class UserFacade {
 	private EntityManager entityManager;
 
 	
-	public User createUser(String email, String password, Role role){
+	public User createUser(String email, String password, String username, Role role){
 		
 
 		User user = new User();
 		user.setEmail(email);
 		user.setPassword(password);
 		user.setRole(role);
+		user.setUsername(username);
 		entityManager.persist(user);
 		return user;
 	}
 
 
-	public User loginUser(String email, String password){
-		System.out.println("inizio: "+email+ " " +password);
-		Query q = entityManager.createQuery("SELECT u FROM User u WHERE u.email=:userEmail AND u.password=:userPassword");
-		  q.setParameter("userEmail", email);
+	public User loginUser(String username, String password){
+		Query q = entityManager.createQuery("SELECT u FROM User u WHERE u.username=:userUsername AND u.password=:userPassword");
+		  q.setParameter("userUsername", username);
 		  q.setParameter("userPassword", password);
 		List<User> users = q.getResultList();
 		System.out.println(users.size());
@@ -60,6 +60,22 @@ public class UserFacade {
 			return user;
 
 	}
+
+
+	public void updateUser(User user) {
+        entityManager.merge(user);
+	}
+	
+    private void deleteUser(User user) {
+        entityManager.remove(user);
+    }
+
+	public void deleteUser(Long id) {
+        User user = entityManager.find(User.class, id);
+        deleteUser(user);
+	}
+
+		
 
 
 }

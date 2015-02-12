@@ -6,6 +6,7 @@ import it.uniroma3.dia.tartbrain.model.Role;
 
 
 
+
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -18,6 +19,7 @@ public class RoleController {
 	@ManagedProperty(value="")
 	private String type;
 	private Role role;
+	private Long id;
 		
 	@EJB
 	private RoleFacade roleFacade;
@@ -41,6 +43,14 @@ public class RoleController {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 
