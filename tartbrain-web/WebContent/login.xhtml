@@ -52,30 +52,37 @@
 							<h:form>
 								<fieldset>
 									<div class="form-group">
-										<h:inputText a:placeholder="E-mail" a:class="form-control"
-											required="true" requiredMessage="email is mandatory"
-											id="email" value="#{userController.email}">
+										<h:inputText autocomplete="off" a:placeholder="Username" a:class="form-control"
+											required="true" requiredMessage="username non inserito"
+											id="username" value="#{userController.username}">
 											
 										</h:inputText>
+										
 									</div>
+									<div><h:message for="username"></h:message></div>
 									<div class="form-group">
 										<h:inputSecret a:placeholder="Password" a:class="form-control"
-											required="true" requiredMessage="password is mandatory"
+											required="true" requiredMessage="password non inserita"
 											id="password" value="#{userController.password}">
 											
 										</h:inputSecret>
+										
 									</div>
+									<div><h:message for="password"></h:message></div>
 									<!--<div class="checkbox">
 									 <label> <input name="remember" type="checkbox"
 										value="Remember Me" />Remember Me
 									</label>
 								</div>-->
+								
+								
+								<p style="color:red"><br>#{userController.message}</br></p>
 									<!-- Change this to a button or input when using this as a form -->
 									<h:commandLink a:class="btn btn-lg btn-success btn-block"
 										value="Login" action="#{userController.loginUser}" />
 								</fieldset>
-								<h:message for="password"></h:message><br/>
-								<h:message for="email"></h:message>
+								
+								
 							</h:form>
 						</f:view>
 					</div>
