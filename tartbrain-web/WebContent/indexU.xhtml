@@ -55,7 +55,25 @@
 
 
 
+<style>
+table {
+	table-layout: fixed;
+}
 
+table th, table td {
+	
+}
+</style>
+
+<style>
+.positivo {
+	background: rgba(21, 188, 32, 0.6);
+}
+
+.negativo {
+	background: rgba(215, 40, 40, 0.6);
+}
+</style>
 
 </head>
 
@@ -93,7 +111,10 @@
 								style="color: black; text-decoration: none; padding-right: 16px;">
 								<h:commandLink action="#{userController.userProfile}"
 									value="Profilo utente"
-									style="color:black;text-align: left;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;padding-right: 0px;padding-left: 0px;" />
+									style="color:black;text-align: left;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;padding-right: 0px;padding-left: 0px;">
+									<f:setPropertyActionListener target="#{solrController.avviato}"
+										value="false" />
+								</h:commandLink>
 							</a>
 						</h:form></li>
 					<li class="divider"></li>
@@ -141,7 +162,9 @@
 
 
 
-							</div> <!-- /input-group --></li>
+
+							</div> <!-- /input-group -->
+							<h:message for="keyword" style="color:red"></h:message></li>
 
 						<li
 							style="padding-left: 0.4cm; padding-top: 0.25cm; padding-bottom: 0.25cm; padding-right: 0.25cm"><a
@@ -229,12 +252,15 @@
 									<ul class="nav nav-second-level">
 
 										<li><h:commandLink action="#{userController.usersList}"
-												value="Gestione utenti" /></li>
+												value="Gestione utenti">
+												<f:setPropertyActionListener
+													target="#{solrController.avviato}" value="false" />
+											</h:commandLink></li>
 
 
 
 
-										<li><a href="./topicSearch.xhtml">Scarica dati</a></li>
+										<li><a href="./topicSearch.xhtml">Scarica dati </a></li>
 									</ul>
 								</h:form>
 							</ul> <!-- /.nav-second-level --></li>
@@ -247,6 +273,7 @@
 		</div>
 		<!-- /.navbar-static-side --> </nav>
 
+
 		<div id="page-wrapper">
 			<div class="row">
 				<div class="col-lg-12">
@@ -254,9 +281,46 @@
 				</div>
 				<!-- /.col-lg-12 -->
 			</div>
-			<ui:fragment rendered="#{solrController.avviato}">
+
+			<ui:fragment rendered="#{!solrController.avviato}">
 				<div class="row">
 					<div class="col-lg-12">
+						<div class="alert alert-success">
+							Sono presenti ${userController.nResults} tweet nel nostro
+							database. <br>Il risultato meno recente risale all'anno
+								${userController.dataMinore}</br>
+						</div>
+						<div id="ex0Tot"></div>
+						<div id="line_top_xTot"></div>
+						<!-- <div id="chart_divTot" style="width: 800px; height: 300px;"></div> -->
+					</div>
+
+
+
+				</div>
+			</ui:fragment>
+			<ui:fragment rendered="#{solrController.avviato}">
+				<!-- BODY DEI CHART -->
+				<div class="row">
+					<div class="col-lg-12">
+
+						<div id="ex0"></div>
+					</div>
+				</div>
+				<div class="row">
+
+
+
+					<div class="col-lg-7">
+						<div id="chart_div"></div>
+						<div id="line_top_x"></div>
+
+
+					</div>
+
+					<!-- /BODY DEI CHART -->
+
+					<div class="col-lg-5">
 
 
 
@@ -267,30 +331,29 @@
 									<table class="table table-bordered table-hover" align="left">
 										<colgroup>
 											<col span="1" style="width: 15%;" />
-											<col span="1" style="width: 15%;" />
-											<col span="1" style="width: 15%;" />
-											<col span="1" style="width: 15%;" />
+
 										</colgroup>
+
 
 										<c:forEach var="tweet" items="#{solrController.results}">
 
-											<tr>
-												<td><br><b>Utente: </b>${tweet.utente}</br> <b>Data:
-												</b>${tweet.data} <br><b>Sentimento:</b>${tweet.sentimento}</br>
+											<tr style="overflow: auto;">
+												<td style="overflow: auto;"><br><b>Utente: </b>${tweet.utente}</br>
+													<b>Data: </b>${tweet.data} <br><b>Sentimento:</b>${tweet.sentimento}</br>
 
-													<br><b>Messaggio:</b> <br>${tweet.testo}</br></br></td>
+													<br><b>Messaggio:</b> <br style="overflow: auto">${tweet.testo}</br></br></td>
 											</tr>
 										</c:forEach>
 									</table>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-sm-2"></div>
-								<div class="col-sm-8">
+
+								<div class="col-sm-4">
 									<center>Pagina #{solrController.pagina} di
 										#{solrController.nPagine}</center>
 								</div>
-								<div class="col-sm-2">
+								<div class="col-sm-8" align="right">
 									<h:form>
 										<div class="dataTables_paginate paging_simple_numbers"
 											id="dataTables-example_paginate">
@@ -312,7 +375,7 @@
 								</div>
 							</div>
 
-							<div class="panel-footer">
+							<div class="panel-footer" align="center">
 								<i>#{solrController.messaggio}</i>
 
 							</div>
@@ -324,14 +387,7 @@
 					<!-- /.col-lg-12 -->
 
 					<div class="row">
-						<div class="col-lg-7">
-
-							<!--Div that will hold the pie chart-->
-							<div id="chart_div"></div>
-
-
-
-						</div>
+						<div class="col-lg-7"></div>
 						<!-- /.panel -->
 
 
@@ -339,8 +395,7 @@
 						<div class="panel-body"></div>
 						<!-- /.row -->
 
-						<div id="columnchart_material"
-							style="width: 900px; height: 500px; padding-left: 10px"></div>
+
 
 
 						<!-- /.panel-body -->
@@ -388,127 +443,45 @@
 
 	<!-- script per i chart -->
 
-
-
-
-
 	<script type="text/javascript">
-
-      // Load the Visualization API and the piechart package.
-      google.load("visualization", "1.1", {packages:["bar", 'corechart']});
-
-      
-
-
-      // Set a callback to run when the Google Visualization API is loaded.
-      google.setOnLoadCallback(drawChart);
-      google.setOnLoadCallback(drawChart2);
-      
-
-      // Callback that creates and populates a data table,
-      // instantiates the pie chart, passes in the data and
-      // draws it.
-      function drawChart() {
-
-        // Create the data table.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Sentimento');
-        data.addColumn('number', 'Numero Tweet');
-        data.addRows([
-          ['Positivo', #{solrController.positivi}],
-          ['Negativo', #{solrController.negativi}],
-          ['Neutro', #{solrController.neutri}]
-
-        ]);
-
-        var x='Analisi dei sentimenti \n  Keyword: \"#{solrController.keyword}\"';
-        
-        if('#{solrController.user}'.length!=0)
-        	x=x+'\nUtente: "#{solrController.user}\"';
-        	
-        	if('#{solrController.dateStart}'.length!=0)
-            	x=x+'\nDal: #{solrController.dateStart} Al: #{solrController.dateEnd}';
-  		if('#{solrController.nResults}'==0)
-	  	x="";
-
-        // Set chart options
-        var options = {'title':x,        				
-                       'width':600,
-                       'height':450,
-                       'colors':['#33CC00','#e0440e','#FF9900'],
-        			   'is3D':true,};
-        
-        
-       
-        
-     
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-
-       
-        chart.draw(data, options);
-        
-      }
-      
-      function drawChart2() {
-          var data = google.visualization.arrayToDataTable(
-           #{solrController.prova}
-          );
-
-          var options = {
-            chart: {
-              title: 'Analisi dei sentimenti negli anni',
-
-             
-            }
-          };
-
-          var chart = new google.visualization.ColumnChart(document.getElementById('columnchart_material'));
-
-          chart.draw(data, options);
-          
-        }
-      
-      
+        window.positivi = #{solrController.positivi}
+        window.negativi = #{solrController.negativi}
+        window.neutri = #{solrController.neutri}
+        window.datiChart = #{solrController.datiChart}
+        window.nResults = #{solrController.nResults}
+        window.datiChartTotali = #{solrController.datiChartTotali}
+        window.datiChartUser = #{userController.datiChart}
+        window.nResultsUser = #{userController.nResults}
+        window.datiChartTotaliUser = #{userController.datiChartTotali}
+        window.keyword = '#{solrController.keyword}'
+        window.dateStart = '#{solrController.dateStart}'
+        window.dateEnd = '#{solrController.dateEnd}'
+        window.user = '#{solrController.user}'
     </script>
+
+	<script type="text/javascript" src="js/drawChart.js" />
+
 
 
 	<!-- Script per calendario su inserimento date -->
 
-	<script>
+	<script type="text/javascript" src="js/drawCalendario.js" />
 
-  $(function() {
-    $( "#from" ).datepicker({
-      defaultDate: "+1w",
-      changeMonth: true,
-      changeYear: true,
-      dateFormat: 'dd/mm/yy',
-      maxDate:0,
-      minDate:new Date(2006,3,21),
-      numberOfMonths: 2,
-      onClose: function( selectedDate ) {
-    	  var minDate = $(this).datepicker('getDate');
-    	    var newMin = new Date(minDate.setDate(minDate.getDate() + 1));
-    	    $( "#to" ).datepicker( "option", "minDate", newMin );
-      }
-    });
-    $( "#to" ).datepicker({
-      defaultDate: "+1w",
-      changeMonth: true,
-      changeYear: true,
-      dateFormat: 'dd/mm/yy',
-      numberOfMonths: 2,
-      maxDate:0,
-      minDate:new Date(2006,3,22),
-      onClose: function( selectedDate ) {
-    	  var maxDate = $(this).datepicker('getDate');
-    	    var newMax  = new Date(maxDate.setDate(maxDate.getDate() - 1));
-    	    $( "#from" ).datepicker( "option", "maxDate",  newMax);
-      }
-    });
-  });
-</script>
+
+
+	<!-- Script per colorare i tweet-->
+	<script type="text/javascript" src="js/coloraTweet.js" />
+
+
+
+
+
+
+
+
+
+
+
 </body>
 
 </html>
