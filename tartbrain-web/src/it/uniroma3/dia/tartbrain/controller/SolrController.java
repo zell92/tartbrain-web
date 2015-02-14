@@ -25,98 +25,70 @@ import org.apache.solr.client.solrj.SolrServerException;
 @SessionScoped
 public class SolrController {
 
-	private String keyword; //da passare	
-	private String user; //da passare
-	private String dateStart=""; //da passare
-	private String dateEnd=""; //da passare
-	private String sentimento; //da passare
+	private String keyword; 	
+	private String user; 
+	private String dateStart=""; 
+	private String dateEnd=""; 
+	private String sentimento; 
 	private List<Tweet> results; 
-	
+
 	private long nResults=0; 
 	private long nPagine=1;
-	
+
 	private long risAttuali=0;
 	private int pagina=1;
 	private String messaggio="nessun risultato";
-	
-	private long positivi;//da togliere
-	private long negativi;//da togliere
-	private long neutri;//da togliere
+
+	private long positivi;
+	private long negativi;
+	private long neutri;
 	private boolean avviato;
-	public List<String> stringhe;
-	public List<List<String>> prova;
+
+	private List<List<String>> datiChart;
+	private List<List<String>> datiChartTotali;
 
 	private SolrFacade solrFacade;
-	
-
-	public String searchKeyword() throws SolrServerException{
-		
-		this.prova= new ArrayList<List<String>>();
-		this.stringhe= new ArrayList<String>();
-		this.stringhe.add("'Anno'");
-		this.stringhe.add("'Valore'");
-		this.prova.add(stringhe);
-		
-		for(int i=0;i<4;i++){
-			this.stringhe= new ArrayList<String>();
-			this.stringhe.add("'2012'");
-			this.stringhe.add("10");
-			this.prova.add(stringhe);
-		}
-		
-
-		
-		if(this.dateEnd==null || this.dateStart==null || this.dateEnd.length()==0 || this.dateStart.length()==0){
-			this.dateEnd="";
-			this.dateStart="";}
-		
-		this.avviato=true;
-		this.solrFacade=new SolrFacade();
-		this.pagina=1;
-		
-		
+	private ChartCreator chartCreator;
 
 
-		this.results= this.ricerca();
+	public String searchKeyword() throws SolrServerException, ParseException{
 
-		this.positivi=solrFacade.getSentimento(keyword, "positivo", this.user, this.dateFormatter(dateStart), this.dateFormatter(dateEnd));
-		this.negativi=solrFacade.getSentimento(keyword, "negativo",this.user, this.dateFormatter(dateStart), this.dateFormatter(dateEnd));
-		this.neutri=solrFacade.getSentimento(keyword, "neutro",this.user, this.dateFormatter(dateStart), this.dateFormatter(dateEnd));
 
-		this.nResults=this.solrFacade.getSentimento(keyword, sentimento, user, this.dateFormatter(dateStart), this.dateFormatter(dateEnd));
+
+		this.initChart();
+		this.results= this.chartCreator.ricerca(this.pagina);
+
+
 		this.nPagine=this.nResults/10+1;
 		this.risAttuali = results.size();
 		if(this.nResults==0)
 			messaggio="nessun risultato";
 		else
-			messaggio=this.risAttuali+" su " +this.nResults + "risultati";
+			messaggio=this.risAttuali+" su " +this.nResults + " risultati";
 		return "indexU";
 
 	}
+	
 
 	public String next() throws SolrServerException{
 		if(this.nResults-risAttuali>0){
 			this.pagina++;
-			results= this.ricerca();
+			results= this.chartCreator.ricerca(this.pagina);
 			this.risAttuali = this.risAttuali+results.size();
 		}
-
-		
 
 		messaggio=this.risAttuali+" su " +this.nResults + "risultati";
 		return "indexU";
 
 	}
+	
+	
 	public String prev() throws SolrServerException{
 		if(this.pagina!=1){
 			this.pagina--;
 			this.risAttuali = this.risAttuali-results.size();
-			results= this.ricerca();
+			results= this.chartCreator.ricerca(this.pagina);
 		}
-
-	
-
-
 
 		messaggio=this.risAttuali+" su " +this.nResults + "risultati";
 		return "indexU";	  
@@ -253,27 +225,28 @@ public class SolrController {
 		this.sentimento = sentimento;
 	}
 
-	public List<String> getStringhe() {
-		return stringhe;
+
+	public List<List<String>> getDatiChartTotali() {
+		return datiChartTotali;
 	}
 
-	public void setStringhe(List<String> stringhe) {
-		this.stringhe = stringhe;
+	public void setDatiChartTotali(List<List<String>> datiChartTotali) {
+		this.datiChartTotali = datiChartTotali;
 	}
 
-	public List<List<String>> getProva() {
-		return prova;
+	public List<List<String>> getDatiChart() {
+		return datiChart;
 	}
 
-	public void setProva(List<List<String>> prova) {
-		this.prova = prova;
+	public void setDatiChart(List<List<String>> datiChart) {
+		this.datiChart = datiChart;
 	}
-
+	/*
 	private List<Tweet> ricerca() throws SolrServerException{
 		String dataIn;
 		String dataFin;
-		
-		
+
+
 		if (this.user==null || this.user.length()==0)
 			this.user=null;
 		if (this.dateStart==null || this.dateStart.length()==0)
@@ -301,29 +274,34 @@ public class SolrController {
 			return solrFacade.search(keyword, user, dataIn, dataFin, (this.pagina-1)*10);
 		//keyword+sentimento+user+data
 		return solrFacade.searchSentimento(keyword, user, dataIn, dataFin, sentimento, (this.pagina-1)*10);
-	}
-	private String dateFormatter(String dateStr) {
-		if(dateStr==null || dateStr.length()==0)
-			return null;
-		SimpleDateFormat out = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		String dateFormat = "dd/MM/yyyy"; 
-		try {
-			return out.format(new SimpleDateFormat(dateFormat).parse(dateStr));
-		} catch (ParseException ignore) { }
-		throw new IllegalArgumentException("Invalid date: " + dateStr);
-	}
-
-	private String giornoCorrente(){
-		Calendar cal = Calendar.getInstance();
-		int day = cal.get(Calendar.DATE);
-		int month = cal.get(Calendar.MONTH) + 1;
-		int year = cal.get(Calendar.YEAR);
-
-		return day+"/"+month+"/"+year;
-	}
+	}*/
 
 
-	public String prova(){
-		return "ciao";
+	private void initChart() throws SolrServerException, ParseException{
+		this.chartCreator=new ChartCreator(keyword, user, dateStart, dateEnd, sentimento);
+		this.setDatiChart(this.chartCreator.generaDatiSentimenti());
+		this.setDatiChartTotali(this.chartCreator.generaDatiTotali());
+
+
+		if(this.dateEnd==null || this.dateStart==null || this.dateEnd.length()==0 || this.dateStart.length()==0){
+			this.dateEnd="";
+			this.dateStart="";}
+
+		this.avviato=true;
+		this.solrFacade=new SolrFacade();
+		this.pagina=1;
+
+		this.positivi= this.chartCreator.getSentimento("positivo");
+		this.negativi=this.chartCreator.getSentimento("negativo");
+		this.neutri=this.chartCreator.getSentimento("neutro");
+
+		this.nResults=this.chartCreator.getSentimento(this.sentimento);
+
+
+
+
+
 	}
+
+
 }

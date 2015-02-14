@@ -2,12 +2,16 @@ package it.uniroma3.dia.tartbrain.controller;
 
 
 import it.uniroma3.dia.tartbrain.facade.RoleFacade;
+import it.uniroma3.dia.tartbrain.facade.SolrFacade;
 import it.uniroma3.dia.tartbrain.facade.UserFacade;
 import it.uniroma3.dia.tartbrain.model.Role;
 import it.uniroma3.dia.tartbrain.model.User;
 import it.uniroma3.dia.tartbrain.util.MyLog4J;
 
+import java.text.ParseException;
 import java.util.List;
+
+
 
 
 
@@ -32,6 +36,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.solr.client.solrj.SolrServerException;
 
 @ManagedBean
 @SessionScoped
@@ -52,7 +57,18 @@ public class UserController {
 	private boolean AUTHENTICATED;
 	private boolean isAdmin;
 	private  List<Role> roles;
+	
+	//per la pagina iniziale
+	private long positivi;
+	private long negativi;
+	private long neutri;
+	private long nResults;
+	private String dataMinore;
+	private List<List<String>> datiChart;
+	private List<List<String>> datiChartTotali;
+	private ChartCreator chartCreator;
 
+	
 	private List<User> users;
 
 	@EJB
@@ -61,6 +77,8 @@ public class UserController {
 	private RoleFacade roleFacade;
 	@EJB
 	private MyLog4J myLog4J;
+	
+	
 
 	public String createUser() {
 		//myLog4J.getLog().debug(this.newRole.getType());
@@ -74,7 +92,7 @@ public class UserController {
 		return this.usersList(); 
 	}
 
-	public String loginUser() {
+	public String loginUser() throws SolrServerException, ParseException {
 
 		//writing some logs at different levels
 		//myLog4J.getLog().debug("login");
@@ -93,6 +111,7 @@ public class UserController {
 		else{
 
 			this.AUTHENTICATED=true; 
+			this.chartGenerator();
 			
 			FacesContext facesContext = FacesContext.getCurrentInstance();
 			HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
@@ -120,6 +139,17 @@ public class UserController {
 
 	}
 
+	private void chartGenerator() throws SolrServerException, ParseException{
+		this.chartCreator=new ChartCreator("*:*", null, "", "", "qualsiasi");
+		this.datiChart=this.chartCreator.generaDatiSentimenti();
+		this.datiChartTotali=this.chartCreator.generaDatiTotali();
+		this.positivi=this.chartCreator.getSentimento("positivo");
+		this.negativi=this.chartCreator.getSentimento("negativo");
+		this.neutri=this.chartCreator.getSentimento("neutro");
+		this.nResults=this.chartCreator.getSentimento("qualsiasi");
+		this.setDataMinore(this.chartCreator.dataMinore());
+		
+	}
 
 
 	public String getMessage() {
@@ -304,6 +334,71 @@ public class UserController {
 
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
+	}
+
+	public ChartCreator getChartCreator() {
+		return chartCreator;
+	}
+
+	public void setChartCreator(ChartCreator chartCreator) {
+		this.chartCreator = chartCreator;
+	}
+
+	public List<List<String>> getDatiChartTotali() {
+		return datiChartTotali;
+	}
+
+	public void setDatiChartTotali(List<List<String>> datiChartTotali) {
+		this.datiChartTotali = datiChartTotali;
+	}
+
+	public List<List<String>> getDatiChart() {
+		return datiChart;
+	}
+
+	public void setDatiChart(List<List<String>> datiChart) {
+		this.datiChart = datiChart;
+	}
+
+
+	public long getNeutri() {
+		return neutri;
+	}
+
+	public void setNeutri(long neutri) {
+		this.neutri = neutri;
+	}
+
+	public long getNegativi() {
+		return negativi;
+	}
+
+	public void setNegativi(long negativi) {
+		this.negativi = negativi;
+	}
+
+	public long getPositivi() {
+		return positivi;
+	}
+
+	public void setPositivi(long positivi) {
+		this.positivi = positivi;
+	}
+
+	public long getnResults() {
+		return nResults;
+	}
+
+	public void setnResults(long nResults) {
+		this.nResults = nResults;
+	}
+
+	public String getDataMinore() {
+		return dataMinore;
+	}
+
+	public void setDataMinore(String dataMinore) {
+		this.dataMinore = dataMinore;
 	}
 
 
