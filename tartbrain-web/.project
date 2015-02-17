@@ -3,6 +3,7 @@
 	<name>tartbrain-web</name>
 	<comment></comment>
 	<projects>
+		<project>tartbrain</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

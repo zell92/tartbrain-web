@@ -6,10 +6,12 @@ import it.uniroma3.dia.tartbrain.facade.SolrFacade;
 import it.uniroma3.dia.tartbrain.facade.UserFacade;
 import it.uniroma3.dia.tartbrain.model.Role;
 import it.uniroma3.dia.tartbrain.model.User;
+import it.uniroma3.dia.tartbrain.util.ChartCreator;
 import it.uniroma3.dia.tartbrain.util.MyLog4J;
 
 import java.text.ParseException;
 import java.util.List;
+
 
 
 
@@ -102,6 +104,7 @@ public class UserController {
 		//log.error("Test Livello ERROR");
 		//log.fatal("Test Livello FATAL");
 		//myLog4J.getLog().debug(AUTHENTICATED);
+		
 		this.roles=this.roleFacade.getAllRole();
 		this.user = userFacade.loginUser(username, password);
 		if(this.user == null){
@@ -113,9 +116,7 @@ public class UserController {
 			this.AUTHENTICATED=true; 
 			this.chartGenerator();
 			
-			FacesContext facesContext = FacesContext.getCurrentInstance();
-			HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
-			session.setAttribute("AUTHENTICATED", this.AUTHENTICATED);
+	
 			this.role=user.getRole();
 			this.email=user.getEmail();
 			this.message = "Benvenuto "+this.username+"!";
@@ -139,15 +140,18 @@ public class UserController {
 
 	}
 
-	private void chartGenerator() throws SolrServerException, ParseException{
+	public void chartGenerator() throws SolrServerException, ParseException{
 		this.chartCreator=new ChartCreator("*:*", null, "", "", "qualsiasi");
-		this.datiChart=this.chartCreator.generaDatiSentimenti();
-		this.datiChartTotali=this.chartCreator.generaDatiTotali();
+		
 		this.positivi=this.chartCreator.getSentimento("positivo");
 		this.negativi=this.chartCreator.getSentimento("negativo");
 		this.neutri=this.chartCreator.getSentimento("neutro");
 		this.nResults=this.chartCreator.getSentimento("qualsiasi");
 		this.setDataMinore(this.chartCreator.dataMinore());
+		
+		this.datiChart=this.chartCreator.generaDatiSentimentiTrimestre(this.dataMinore);
+		this.datiChartTotali=this.chartCreator.generaDatiTotaliTrimestre(this.dataMinore);
+		
 		
 	}
 
@@ -399,6 +403,14 @@ public class UserController {
 
 	public void setDataMinore(String dataMinore) {
 		this.dataMinore = dataMinore;
+	}
+
+	public boolean isAUTHENTICATED() {
+		return AUTHENTICATED;
+	}
+
+	public void setAUTHENTICATED(boolean aUTHENTICATED) {
+		AUTHENTICATED = aUTHENTICATED;
 	}
 
 

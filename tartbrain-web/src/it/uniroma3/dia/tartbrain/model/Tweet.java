@@ -56,7 +56,7 @@ public class Tweet {
 	
 	private static String dateFormatter(String dateStr) {
 		String data = "";
-		data = dateStr.substring(8,10)+" "+ dateStr.substring(4,7)+" "+dateStr.substring(dateStr.length()-4,dateStr.length());
+		data = dateStr.substring(8,10)+" "+ dateStr.substring(4,7)+" "+dateStr.substring(dateStr.length()-4,dateStr.length())+" alle: "+dateStr.substring(11,20);
 		return data;
 				
 	}
