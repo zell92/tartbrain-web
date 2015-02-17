@@ -2,6 +2,9 @@
     <wb-module deploy-name="tartbrain-web">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="tartbrain.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/tartbrain/tartbrain">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/tartbrain-web/build/classes"/>
         <property name="context-root" value="tartbrain-web"/>
     </wb-module>

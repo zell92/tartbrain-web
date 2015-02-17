@@ -4,6 +4,7 @@ package it.uniroma3.dia.tartbrain.controller;
 
 import it.uniroma3.dia.tartbrain.facade.SolrFacade;
 import it.uniroma3.dia.tartbrain.model.Tweet;
+import it.uniroma3.dia.tartbrain.util.ChartCreator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

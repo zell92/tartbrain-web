@@ -163,8 +163,7 @@ table th, table td {
 
 
 
-							</div> <!-- /input-group -->
-							<h:message for="keyword" style="color:red"></h:message></li>
+							</div> <!-- /input-group --> <h:message for="keyword" style="color:red"></h:message></li>
 
 						<li
 							style="padding-left: 0.4cm; padding-top: 0.25cm; padding-bottom: 0.25cm; padding-right: 0.25cm"><a
@@ -260,7 +259,12 @@ table th, table td {
 
 
 
-										<li><a href="./topicSearch.xhtml">Scarica dati </a></li>
+										<li><h:commandLink
+												action="#{topicSearchController.redirect}"
+												value="Scarica dati">
+												<f:setPropertyActionListener
+													target="#{solrController.avviato}" value="false" />
+											</h:commandLink></li>
 									</ul>
 								</h:form>
 							</ul> <!-- /.nav-second-level --></li>
@@ -282,7 +286,13 @@ table th, table td {
 				<!-- /.col-lg-12 -->
 			</div>
 
+
+
 			<ui:fragment rendered="#{!solrController.avviato}">
+
+
+
+
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="alert alert-success">
@@ -299,24 +309,50 @@ table th, table td {
 
 				</div>
 			</ui:fragment>
+
 			<ui:fragment rendered="#{solrController.avviato}">
+
+				<div class="row">
+		
+					<div class="col-lg-12">
+						<h4 class="page-header">
+							Campi di ricerca:
+						</h4>
+						<div class="alert alert-success col-lg-3">Keyword:
+							"#{solrController.keyword}"</div> 
+							<div class="col-lg-1"/>
+						<div class="alert alert-success col-lg-2">Sentimento:
+							"#{solrController.sentimento}"</div> 
+							<div class="col-lg-1"/>
+							<ui:fragment rendered="#{solrController.user.length()!=0}">
+						<div class="alert alert-success col-lg-2">Utente:
+							"#{solrController.user}"</div> 
+							<div class="col-lg-1"/></ui:fragment>
+							<ui:fragment rendered="#{solrController.dateStart.length()!=0}">
+						<div class="alert alert-success col-lg-2">
+							Range di Date: <br>Dal: "#{solrController.dateStart}"</br>
+							Al: "#{solrController.dateEnd}"
+						</div></ui:fragment>
+					</div>
+					
+					<!-- /.col-lg-12 -->
+				</div>
+
 				<!-- BODY DEI CHART -->
 				<div class="row">
 					<div class="col-lg-12">
 
+
 						<div id="ex0"></div>
+						<div id="line_top_x"></div>
+
 					</div>
 				</div>
 				<div class="row">
 
 
 
-					<div class="col-lg-7">
-						<div id="chart_div"></div>
-						<div id="line_top_x"></div>
 
-
-					</div>
 
 					<!-- /BODY DEI CHART -->
 
@@ -381,6 +417,12 @@ table th, table td {
 							</div>
 						</div>
 
+
+
+					</div>
+
+					<div class="col-lg-7">
+						<div id="chart_div"></div>
 
 
 					</div>
@@ -457,6 +499,7 @@ table th, table td {
         window.dateStart = '#{solrController.dateStart}'
         window.dateEnd = '#{solrController.dateEnd}'
         window.user = '#{solrController.user}'
+        window.sentimento = '#{solrController.sentimento}'
     </script>
 
 	<script type="text/javascript" src="js/drawChart.js" />
