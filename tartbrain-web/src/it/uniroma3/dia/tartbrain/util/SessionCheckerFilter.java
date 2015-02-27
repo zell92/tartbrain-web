@@ -35,23 +35,20 @@ public class SessionCheckerFilter implements Filter {
 		HttpSession session = ((HttpServletRequest) request).getSession(false);
 		UserController userController = (session != null) ? (UserController) session.getAttribute("userController") : null;
 
+		boolean authenticated = false;
+		if (userController!= null)
+			authenticated=userController.isAUTHENTICATED();
 
-		
-			if((userController==null)||(!request.getRequestURI().endsWith("login.xhtml") && !userController.isAUTHENTICATED())){
-				response.sendRedirect(request.getContextPath() + "/faces/login.xhtml");
-				
-			} /*
-			
-			if(request.getRequestURI().endsWith("login.xhtml") && userController.isAUTHENTICATED()){
-				response.sendRedirect(request.getContextPath() + "/faces/indexU.xhtml");
-			} 
-		}else{
-			System.out.println("aaaa");
+
+		if( !request.getRequestURI().endsWith("login.xhtml") && !authenticated){
+
 			response.sendRedirect(request.getContextPath() + "/faces/login.xhtml");
-		}*/
+			
 
-	
-		chain.doFilter(req, res);
+		} else
+
+
+			chain.doFilter(req, res);
 	}
 
 	public void destroy() {
